@@ -6,7 +6,6 @@ from backend.app.logging import logger
 
 
 def _libreoffice_convert(input_path: str, output_dir: str, output_format: str) -> str:
-    """Use LibreOffice headless to convert docs. Returns output file path."""
     cmd = [
         settings.LIBREOFFICE_PATH, "--headless", "--convert-to",
         output_format, "--outdir", output_dir, input_path,
@@ -19,7 +18,6 @@ def _libreoffice_convert(input_path: str, output_dir: str, output_format: str) -
 
 
 def convert(job_id: str, input_path: str, input_fmt: str, output_fmt: str) -> str:
-    """Main dispatch function. Returns output filename (not full path)."""
     output_dir = settings.OUTPUT_DIR
     stem = job_id
     output_filename = f"{stem}.{output_fmt}"
