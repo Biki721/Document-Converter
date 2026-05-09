@@ -1,18 +1,17 @@
 /**
- * components.js — Reusable UI component functions
+ * components.js — Reusable UI helpers
  */
-
 const FORMAT_EMOJI = {
   pdf: "📄", docx: "📝", xlsx: "📊", csv: "📋",
   pptx: "📑", txt: "📃", html: "🌐",
-  png: "🖼️", jpg: "🖼️", jpeg: "🖼️", bmp: "🖼️", zip: "🗜️",
+  png: "🖼️", jpg: "🖼️", jpeg: "🖼️", bmp: "🖼️", zip: "🗄️",
 };
 const getEmoji = ext => FORMAT_EMOJI[ext?.toLowerCase()] || "📄";
 
 function StatusBadge(status) {
   const labels = { pending: "Pending", processing: "Processing", completed: "Completed", failed: "Failed" };
   const dot = status === "processing"
-    ? `<span class="status-dot-live" aria-hidden="true"></span>`
+    ? `<span class="status-dot-live" aria-hidden="true"></span> `
     : "";
   return `<span class="status-badge status-${status}">${dot}${labels[status] || status}</span>`;
 }
