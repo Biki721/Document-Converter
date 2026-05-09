@@ -8,7 +8,7 @@ pydantic-settings==2.2.1
 # Task queue
 celery==5.3.6
 redis==5.0.4
-aioredis==2.0.1
+# aioredis removed — redis>=4.2 ships redis.asyncio which works on Python 3.11+
 
 # Document conversion
 pdf2docx==0.5.8
