@@ -7,6 +7,7 @@ const API_BASE = window.API_BASE || "http://localhost:8000";
 const Api = {
   async health() {
     const r = await fetch(`${API_BASE}/health`);
+    if (!r.ok) throw new Error("API health check failed");
     return r.json();
   },
 
