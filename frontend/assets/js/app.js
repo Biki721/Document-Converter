@@ -1,7 +1,6 @@
 /**
  * app.js — Router, State, Page renderers
  */
-
 const State = {
   jobs: [],
   formats: null,
@@ -17,9 +16,7 @@ const Router = {
     "/formats": renderFormatsPage,
   },
   current: null,
-  navigate(path) {
-    window.location.hash = "#" + path;
-  },
+  navigate(path) { window.location.hash = "#" + path; },
   resolve() {
     const hash = window.location.hash.replace("#", "") || "/";
     const path = hash.split("?")[0];
@@ -41,10 +38,10 @@ async function checkApiStatus() {
   const text = document.getElementById("status-text");
   try {
     const data = await Api.health();
-    dot.className  = "status-dot online";
+    dot.className   = "status-dot online";
     text.textContent = `API v${data.version}`;
   } catch {
-    dot.className  = "status-dot offline";
+    dot.className   = "status-dot offline";
     text.textContent = "Offline";
   }
 }
@@ -64,18 +61,16 @@ function startPolling(jobId) {
       const idx = State.jobs.findIndex(j => j.job_id === jobId);
       if (idx >= 0) State.jobs[idx] = job;
       else State.jobs.unshift(job);
-
       updateBadge();
-
       if (job.status === "completed" || job.status === "failed") {
         clearInterval(State.pollers[jobId]);
         delete State.pollers[jobId];
-        if (job.status === "completed") showToast(`✓ Conversion complete: ${job.output_filename}`, "success");
-        else showToast(`✗ Job failed: ${job.error || "Unknown error"}`, "error");
+        if (job.status === "completed") showToast(`✓ Done: ${job.output_filename}`, "success");
+        else showToast(`✗ Failed: ${job.error || "Unknown error"}`, "error");
       }
-
       if (Router.current === "/jobs") renderJobsPage();
-      if (Router.current === "/" && document.getElementById("job-result-"+jobId)) renderJobResult(job);
+      const resultEl = document.getElementById("job-result-" + jobId);
+      if (resultEl) renderJobResult(job);
     } catch {}
   }, 2000);
 }
@@ -115,35 +110,31 @@ async function renderUploadPage() {
           <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
         </div>
         <p class="upload-title">Drop your file here</p>
-        <p class="upload-subtitle">or <strong>browse</strong> to upload &middot; Max 50 MB</p>
+        <p class="upload-subtitle">or <strong>browse</strong> to upload &nbsp;&middot;&nbsp; Max 50 MB</p>
       </div>
       <div id="file-preview-wrap"></div>
       <div id="format-picker-wrap"></div>
       <div id="convert-btn-wrap" style="margin-top:var(--space-6)"></div>
       <div id="job-result-wrap"></div>
-    </div>
-  `;
+    </div>`;
 
   let selectedFile = null;
   let selectedFormat = null;
 
-  const zone = document.getElementById("upload-zone");
+  const zone      = document.getElementById("upload-zone");
   const fileInput = document.getElementById("file-input");
 
-  zone.addEventListener("dragover", e => { e.preventDefault(); zone.classList.add("drag-over"); });
+  zone.addEventListener("dragover",  e => { e.preventDefault(); zone.classList.add("drag-over"); });
   zone.addEventListener("dragleave", () => zone.classList.remove("drag-over"));
   zone.addEventListener("drop", e => {
-    e.preventDefault();
-    zone.classList.remove("drag-over");
-    const f = e.dataTransfer.files[0];
-    if (f) handleFile(f);
+    e.preventDefault(); zone.classList.remove("drag-over");
+    if (e.dataTransfer.files[0]) handleFile(e.dataTransfer.files[0]);
   });
   zone.addEventListener("keydown", e => { if (e.key === "Enter" || e.key === " ") fileInput.click(); });
   fileInput.addEventListener("change", e => { if (e.target.files[0]) handleFile(e.target.files[0]); });
 
   function handleFile(file) {
-    selectedFile = file;
-    selectedFormat = null;
+    selectedFile = file; selectedFormat = null;
     const ext = file.name.split(".").pop().toLowerCase();
     renderFilePreview(file, ext);
     renderFormatPicker(ext);
@@ -177,19 +168,21 @@ async function renderUploadPage() {
     const targets = conversionMap[ext] || [];
     const wrap = document.getElementById("format-picker-wrap");
     if (!targets.length) {
-      wrap.innerHTML = `<p class="text-muted mt-4">⚠ No supported output formats for <strong>.${ext}</strong>. See the <a href="#/formats" style="color:var(--color-primary)">Formats</a> page.</p>`;
+      wrap.innerHTML = `<p class="text-muted mt-4">⚠️ No supported outputs for <strong>.${ext}</strong>. See <a href="#/formats" style="color:var(--color-primary)">Formats</a>.</p>`;
       return;
     }
     wrap.innerHTML = `<div class="format-section"><div class="format-label">Convert to</div><div id="pills-container"></div></div>`;
-    const pills = FormatPills(targets, selectedFormat, fmt => {
-      selectedFormat = fmt;
-      document.querySelectorAll(".format-pill").forEach(p => {
-        p.classList.toggle("selected", p.textContent.toLowerCase() === fmt);
-        p.setAttribute("aria-pressed", p.textContent.toLowerCase() === fmt);
-      });
-      renderConvertBtn();
-    });
-    document.getElementById("pills-container").appendChild(pills);
+    document.getElementById("pills-container").appendChild(
+      FormatPills(targets, selectedFormat, fmt => {
+        selectedFormat = fmt;
+        document.querySelectorAll(".format-pill").forEach(p => {
+          const match = p.textContent.trim().toLowerCase() === fmt;
+          p.classList.toggle("selected", match);
+          p.setAttribute("aria-pressed", match);
+        });
+        renderConvertBtn();
+      })
+    );
   }
 
   function renderConvertBtn() {
@@ -199,42 +192,32 @@ async function renderUploadPage() {
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
       Convert${selectedFormat ? " to ." + selectedFormat.toUpperCase() : ""}
     </button>`;
-    if (ready) {
-      document.getElementById("convert-btn").addEventListener("click", doConvert);
-    }
+    if (ready) document.getElementById("convert-btn").addEventListener("click", doConvert);
   }
 
   async function doConvert() {
     const btn = document.getElementById("convert-btn");
-    btn.disabled = true;
-    btn.textContent = "Uploading…";
+    btn.disabled = true; btn.textContent = "Uploading…";
     try {
       const result = await Api.uploadConvert(selectedFile, selectedFormat);
       const job = {
-        job_id: result.job_id,
-        status: result.status,
+        job_id: result.job_id, status: result.status,
         input_filename: selectedFile.name,
         input_format: selectedFile.name.split(".").pop().toLowerCase(),
         output_format: selectedFormat,
-        progress: 0,
-        created_at: new Date().toISOString(),
+        progress: 0, created_at: new Date().toISOString(),
       };
-      State.jobs.unshift(job);
-      updateBadge();
-
-      const resultWrap = document.getElementById("job-result-wrap");
-      resultWrap.innerHTML = `<div id="job-result-${job.job_id}" class="job-result"></div>`;
+      State.jobs.unshift(job); updateBadge();
+      const rw = document.getElementById("job-result-wrap");
+      rw.innerHTML = `<div id="job-result-${job.job_id}" class="job-result"></div>`;
       renderJobResult(job);
       startPolling(job.job_id);
-
       showToast("Job queued — conversion started!", "info");
-      btn.textContent = "Convert another file";
-      btn.disabled = false;
+      btn.disabled = false; btn.textContent = "Convert another file";
       btn.onclick = () => Router.resolve();
     } catch (err) {
       showToast(err.message, "error");
-      btn.disabled = false;
-      btn.textContent = "Retry";
+      btn.disabled = false; btn.textContent = "Retry";
       btn.onclick = doConvert;
     }
   }
@@ -250,9 +233,9 @@ function renderJobsPage() {
       <div class="page-header flex justify-between items-center">
         <div>
           <h1 class="page-title">Jobs</h1>
-          <p class="page-subtitle">All conversion jobs in this session.</p>
+          <p class="page-subtitle">All conversion jobs this session.</p>
         </div>
-        <button class="btn btn-secondary btn-sm" id="refresh-jobs-btn" aria-label="Refresh jobs">
+        <button class="btn btn-secondary btn-sm" id="refresh-jobs-btn">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
           Refresh
         </button>
@@ -291,15 +274,13 @@ function renderJobsPage() {
       <div class="job-meta" style="font-family:var(--font-mono)">${job.progress || 0}%</div>
       <div class="job-actions">
         ${job.status === "completed"
-          ? `<a href="${Api.downloadUrl(job.job_id)}" target="_blank" rel="noopener noreferrer" class="btn btn-secondary btn-sm" aria-label="Download ${job.output_filename}">
+          ? `<a href="${Api.downloadUrl(job.job_id)}" target="_blank" rel="noopener noreferrer" class="btn btn-secondary btn-sm">
               <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
               Download
-            </a>`
-          : ""}
+            </a>` : ""}
       </div>`;
     container.appendChild(row);
   });
-
   list.appendChild(container);
 }
 
@@ -314,15 +295,14 @@ async function renderFormatsPage() {
       <p class="page-subtitle">All available input → output conversion pairs.</p>
     </div>
     <div id="formats-content">
-      <div class="formats-grid">
-        ${[1,2,3,4,5,6].map(() => `
-          <div class="format-card">
-            <div class="skeleton" style="height:1.5rem;width:60px;margin-bottom:var(--space-3)"></div>
-            <div class="flex gap-2">
-              <div class="skeleton" style="height:1.2rem;width:40px;border-radius:var(--radius-full)"></div>
-              <div class="skeleton" style="height:1.2rem;width:40px;border-radius:var(--radius-full)"></div>
-            </div>
-          </div>`).join("")}
+      <div class="formats-grid">${[1,2,3,4,5,6].map(() =>
+        `<div class="format-card">
+          <div class="skeleton" style="height:1.5rem;width:60px;margin-bottom:var(--space-3)"></div>
+          <div class="flex gap-2">
+            <div class="skeleton" style="height:1.2rem;width:40px;border-radius:var(--radius-full)"></div>
+            <div class="skeleton" style="height:1.2rem;width:40px;border-radius:var(--radius-full)"></div>
+          </div>
+        </div>`).join("")}
       </div>
     </div>`;
 
@@ -330,7 +310,6 @@ async function renderFormatsPage() {
     const data = State.formats || await Api.getFormats();
     State.formats = data;
     data.conversions.forEach(c => { conversionMap[c.from] = c.to; });
-
     const grid = document.createElement("div");
     grid.className = "formats-grid";
     data.conversions.forEach(c => {
@@ -339,29 +318,29 @@ async function renderFormatsPage() {
       card.innerHTML = `
         <span class="format-card-from">${getEmoji(c.from)} .${c.from}</span>
         <div class="text-muted" style="font-size:var(--text-xs)">converts to</div>
-        <div class="format-targets">
-          ${c.to.map(t => `<span class="format-target">.${t}</span>`).join("")}
-        </div>`;
+        <div class="format-targets">${c.to.map(t => `<span class="format-target">.${t}</span>`).join("")}</div>`;
       grid.appendChild(card);
     });
-    document.getElementById("formats-content").innerHTML = "";
-    document.getElementById("formats-content").appendChild(grid);
-  } catch (err) {
+    const fc = document.getElementById("formats-content");
+    fc.innerHTML = ""; fc.appendChild(grid);
+  } catch {
     document.getElementById("formats-content").innerHTML = EmptyState({
       icon: `<svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>`,
       title: "Could not load formats",
-      body: "Make sure the backend API is running and accessible.",
+      body: "Make sure the backend API is running on localhost:8000.",
     });
   }
 }
 
-// Theme toggle
-(function() {
-  const btn = document.querySelector("[data-theme-toggle]");
+// ====================================================
+// Theme Toggle
+// ====================================================
+(function () {
+  const btn  = document.querySelector("[data-theme-toggle]");
   const html = document.documentElement;
-  let theme = html.getAttribute("data-theme") || (matchMedia("(prefers-color-scheme:dark)").matches ? "dark" : "light");
+  let theme  = html.getAttribute("data-theme") ||
+    (matchMedia("(prefers-color-scheme:dark)").matches ? "dark" : "light");
   html.setAttribute("data-theme", theme);
-
   function updateIcon() {
     if (!btn) return;
     btn.innerHTML = theme === "dark"
@@ -377,8 +356,10 @@ async function renderFormatsPage() {
   });
 })();
 
-// Mobile sidebar toggle
-(function() {
+// ====================================================
+// Mobile Sidebar
+// ====================================================
+(function () {
   const menuBtn = document.getElementById("menu-btn");
   const sidebar = document.getElementById("sidebar");
   if (!menuBtn || !sidebar) return;
@@ -386,12 +367,10 @@ async function renderFormatsPage() {
     const open = sidebar.classList.toggle("open");
     menuBtn.setAttribute("aria-expanded", open);
   });
-  sidebar.querySelectorAll(".nav-item").forEach(a => {
-    a.addEventListener("click", () => {
-      sidebar.classList.remove("open");
-      menuBtn.setAttribute("aria-expanded", "false");
-    });
-  });
+  sidebar.querySelectorAll(".nav-item").forEach(a => a.addEventListener("click", () => {
+    sidebar.classList.remove("open");
+    menuBtn.setAttribute("aria-expanded", "false");
+  }));
   document.addEventListener("click", e => {
     if (sidebar.classList.contains("open") && !sidebar.contains(e.target) && e.target !== menuBtn) {
       sidebar.classList.remove("open");
@@ -400,14 +379,15 @@ async function renderFormatsPage() {
   });
 })();
 
+// ====================================================
 // Bootstrap
+// ====================================================
 async function init() {
   try {
     const data = await Api.getFormats();
     State.formats = data;
     data.conversions.forEach(c => { conversionMap[c.from] = c.to; });
   } catch {}
-
   checkApiStatus();
   setInterval(checkApiStatus, 30000);
   Router.resolve();
