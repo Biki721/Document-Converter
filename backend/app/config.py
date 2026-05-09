@@ -21,7 +21,7 @@ class Settings(BaseSettings):
     CELERY_RESULT_BACKEND: str = "redis://redis:6379/0"
 
     # Job
-    JOB_TTL_SECONDS: int = 3600  # 1 hour
+    JOB_TTL_SECONDS: int = 3600
     MAX_CONCURRENT_JOBS: int = 10
 
     # LibreOffice
@@ -33,7 +33,6 @@ class Settings(BaseSettings):
 
 settings = Settings()
 
-# Ensure directories exist
 os.makedirs(settings.UPLOAD_DIR, exist_ok=True)
 os.makedirs(settings.OUTPUT_DIR, exist_ok=True)
 

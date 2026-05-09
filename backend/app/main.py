@@ -52,7 +52,6 @@ async def health_check():
 
 @app.get("/api/v1/formats", tags=["Info"])
 async def supported_formats():
-    """Returns all supported conversion pairs."""
     return {
         "conversions": [
             {"from": "docx", "to": ["pdf", "txt", "html"]},
