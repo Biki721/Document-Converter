@@ -5,7 +5,7 @@ import uuid, os, shutil
 from backend.app.config import settings, SUPPORTED_CONVERSIONS
 from backend.app.db.redis_client import set_job
 from backend.app.models.job import JobStatus, JobResponse
-from backend.app.worker.celery_app import celery_app
+from backend.worker.celery_app import celery_app
 from backend.app.logging import logger
 
 router = APIRouter()
