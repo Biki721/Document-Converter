@@ -139,9 +139,9 @@ async function renderUploadPage() {
   root.innerHTML = `
     <section class="page-header">
       <div>
-        <span class="eyebrow">DocConvert Studio</span>
-        <h1 class="page-title">Convert client files cleanly.</h1>
-        <p class="page-subtitle">A polished workspace for PDF, Office, spreadsheet, image, and text conversion with live job progress and a monetization-ready layout.</p>
+        <span class="eyebrow">Universal document converter</span>
+        <h1 class="page-title"><span>Convert any</span><span class="hero-highlight">document</span></h1>
+        <p class="page-subtitle">PDF, DOCX, XLSX, PPTX, images and more. Instant conversion, live progress, and a premium interface ready for paid tiers.</p>
         <div class="hero-actions">
           <a class="btn btn-primary" href="#/" aria-current="page">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
@@ -153,24 +153,29 @@ async function renderUploadPage() {
           </a>
         </div>
       </div>
-      <div class="hero-metrics" aria-label="Conversion highlights">
-        <div class="metric"><strong>15+</strong><span>Format routes</span></div>
-        <div class="metric"><strong>50MB</strong><span>Upload limit</span></div>
-        <div class="metric"><strong>Live</strong><span>Job tracking</span></div>
-      </div>
     </section>
+
+    <div class="format-rail" aria-label="Popular input formats">
+      <span>.DOCX</span>
+      <span>.PDF</span>
+      <span>.XLSX</span>
+      <span>.PPTX</span>
+      <span>.TXT</span>
+      <span>.PNG</span>
+      <span>.JPG</span>
+    </div>
 
     <section class="upload-layout">
       <div class="conversion-panel">
         <div class="panel-heading">
           <div>
-            <span class="panel-kicker">Convert</span>
-            <h2>New file</h2>
-            <p>Drop a document, choose the output, and keep moving.</p>
+            <span class="panel-kicker">Upload</span>
+            <h2>Drag &amp; drop your file</h2>
+            <p>Select an input file, then choose the destination format below.</p>
           </div>
           <span class="security-note">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z"/></svg>
-            Session based
+            Max 50 MB
           </span>
         </div>
 
@@ -180,7 +185,7 @@ async function renderUploadPage() {
             <div class="upload-icon">
               <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
             </div>
-            <p class="upload-title">Drop your file here</p>
+            <p class="upload-title">Drag &amp; drop your file</p>
             <p class="upload-subtitle">or <strong>browse</strong> to upload</p>
             <div class="upload-specs" aria-label="Upload details">
               <span class="spec-pill">PDF</span>
